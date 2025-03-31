@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme{
+    --color-bg: #222222;
+    --color-nav-blue: #1A66FF;
+    --color-dark: #0d0d0d;
+    --color-border: #f5f5dc;
+    --color-bg-blue: rgba(17, 24, 39, 1);
+}
+
+.profile{
+    border-radius: 50px;
+}
+
+.profile:hover{
+    scale: 1.5;
+    border-color: white;
+    cursor: pointer;
+}
