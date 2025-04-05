@@ -8,17 +8,28 @@ import { Auth } from '../context/Firebase';
 import { useContext } from 'react';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from '../Firebase';
+import { getDatabase, ref, set, child } from "firebase/database";
+import { useEffect } from 'react';
 
 function Home(){
   
+  const db = getDatabase(app);
   const context = useContext(Auth);
   const auth = getAuth(app);
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      console.log(uid);
-    }})
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && context.username.trim()) {
+        const uid = user.uid;
+        console.log("Writing to DB for UID:", uid);
+        context.setUid(uid);
+      } else {
+        console.log("Skipped DB write - missing username");
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [context.username]);
 
   if(!context || !context.logIn){
     return(
@@ -29,7 +40,7 @@ function Home(){
     )
   } else{
     return(
-      <div className='bg-bg p-8 flex flex-row justify-between' style={{height:"47.65vw", width:"100vw" }}>
+      <div className='bg-bg p-4 flex flex-row justify-between' style={{height:"47.65vw", width:"100vw" }}>
         <NavBar />
         <div>
           <SearchBar />

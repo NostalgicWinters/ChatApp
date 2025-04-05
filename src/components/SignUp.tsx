@@ -4,24 +4,33 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { app } from '../Firebase'
 import { Auth } from '../context/Firebase';
 import { Link } from 'react-router-dom';
+import { getDatabase, set, ref } from 'firebase/database';
 
 const SignUp = () => {
 
   const auth = getAuth(app);
-  const newAuth = useContext(Auth);
+  const context = useContext(Auth);
+  const db = getDatabase(app);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
-  const createUser = (e) => {
+  const createUser = (e: React.FormEvent) => {
     e.preventDefault();
+  
     createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then((userCredential) => {
         alert("Success!!!");
-        newAuth.setLogIn(true);
+  
+        const uid = userCredential.user.uid;
+        set(ref(db, `users/${uid}`), {
+          id: uid,
+          username: context.username,
+        });
+  
+        context.setLogIn(true);
       })
-      .catch((error) => alert(error.message))
+      .catch((error) => alert(error.message));
   };
 
   return (
@@ -29,8 +38,12 @@ const SignUp = () => {
       <div className="form-container m-20">
         <p className="title">SignUp</p>
         <form className="form" onSubmit={createUser}>
+          <div className='input-group'>
+            <label>Username</label>
+            <input placeholder='Enter your username' value={context.username} onChange={(e)=>context.setUsername(e.target.value)} />
+          </div>
           <div className="input-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="email">Email</label>
             <input type="email" name="username" id="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Enter Email" />
           </div>
           <div className="input-group">
