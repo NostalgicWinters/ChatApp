@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { app } from '../Firebase'
 import { Auth } from '../context/Firebase';
 import { Link } from 'react-router-dom';
-import { getDatabase, set, ref } from 'firebase/database';
+import { getDatabase, set, ref, get } from 'firebase/database';
 
 const SignUp = () => {
 
@@ -15,23 +15,41 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const createUser = (e: React.FormEvent) => {
+  const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        alert("Success!!!");
+    const username = context.username.trim();
+    if (!username) {
+      alert("Username cannot be empty.");
+      return;
+    }
   
-        const uid = userCredential.user.uid;
-        set(ref(db, `users/${uid}`), {
-          id: uid,
-          username: context.username,
-        });
+    const usernameRef = ref(db, `users/${username}`);
   
-        context.setLogIn(true);
-      })
-      .catch((error) => alert(error.message));
+    try {
+      const snapshot = await get(usernameRef);
+      
+      if (snapshot.exists()) {
+        alert("Username already exists. Please choose a different one.");
+        return;
+      }
+  
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      alert("Success!!!");
+  
+      const uid = userCredential.user.uid;
+  
+      await set(usernameRef, {
+        id: uid,
+        username: username,
+      });
+  
+      context.setLogIn(true);
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
+  
 
   return (
     <StyledWrapper>

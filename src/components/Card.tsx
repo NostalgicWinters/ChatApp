@@ -1,9 +1,12 @@
 import React from 'react'
 import { Auth } from '../context/Firebase'
 import { useContext } from 'react'
+import { getDatabase, get, ref } from 'firebase/database';
+import { app } from '../Firebase';
 
 function Card({username}) {
   
+  const db = getDatabase(app);
   const context = useContext(Auth);
 
   return (
