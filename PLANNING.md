@@ -60,3 +60,7 @@
 - user_id
 - server_id
 - status
+- device_id
+- status
+- created_at
+- last_heartbeat
