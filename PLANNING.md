@@ -42,13 +42,14 @@
 - group_name
 - user_ids
 
-### T_Unsent_Messages
+### T_Messages
 - message_id
 - sender_id
 - reciever_id
 - content
 - media_url
 - timestamp
+- status
 
 ### T_LastOnline
 - user_id
