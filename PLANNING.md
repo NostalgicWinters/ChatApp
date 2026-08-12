@@ -50,6 +50,7 @@
 - media_url
 - timestamp
 - status
+- read_status
 
 ### T_LastOnline
 - user_id
