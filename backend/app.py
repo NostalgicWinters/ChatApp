@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from backend.services import chatService
+from services import chatService
 from core.config import Settings, get_settings
-from services.chatService import ChatService
+from services.chatService import ConnectionManager
 from routes.chatRoute import router as chat_router
 
 
@@ -10,12 +10,12 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title=settings.app_name,
-        version=settings.version,
+        version=settings.app_version,
         debug=settings.debug,
     )
 
     app.state.settings = settings
-    app.state.chatService = ChatService(settings)
+    manager = ConnectionManager()
 
     app.include_router(chat_router)
 
