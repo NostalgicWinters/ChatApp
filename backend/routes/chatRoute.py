@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Request, WebSocket
+from fastapi import APIRouter, Request, WebSocket, WebSocketDisconnect
+from services.chatService import ConnectionManager
 
 router = APIRouter()
+
+manager = ConnectionManager()
 
 
 @router.get("/test")
@@ -8,9 +11,15 @@ async def test():
     return {"message": "ok"}
 
 
-@router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message sent was {data}")
+@router.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.send_message(data)
+            await manager.broadcast(f"Client #{client_id} says: {data}")
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} has left the chat.")
