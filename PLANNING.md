@@ -2,6 +2,10 @@
 
 ---
 
+### AMP (Absolute Minimal Product)
+- One on One Chatting
+
+---
 ## Functional Requirements
 - One on One Chatting
 - Online status
